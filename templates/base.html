@@ -58,13 +58,37 @@
                 </div>
             </div> 
             <div>
-            <a href="#" class="nav_link"> 
+                {% if request.user.is_authenticated %}
+            <a href="{% url 'sign-out' %}" class="nav_link"> 
                 <i class='bx bx-log-out nav_icon'></i> 
                 <span class="nav_name">SignOut</span> 
             </a>
+            {% else %}
+            <a href="{% url 'sign-in' %}" class="nav_link"> 
+                <i class='bx bx-log-out nav_icon'></i> 
+                <span class="nav_name">SignIn</span> 
+            </a>
+            {% endif %}
         </div>
         </nav>
     </div>
+    <!--message container-->
+
+        <!-- if there are messages to display-->
+    {%if messages%}
+    <div class="alert alert-info alert-dismissible fade show col-md-4 mx-auto  text-center"
+          role="alert"
+        >
+          {% for message in messages %}
+          <h6>{{ message }}</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    
+          {% endfor %}
+    </div>
+    {% endif %}
+    
+
+
     <!--Container Main start-->
     <main class = 'container' style ="width: 100%;">
         {% block content %}
