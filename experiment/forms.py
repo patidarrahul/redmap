@@ -39,3 +39,31 @@ class SupplierForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control mt-2', 'placeholder': 'Name'}),
           
         }
+
+
+class SpinStepForm(forms.ModelForm):
+    class Meta:
+        model = SpinStep
+        fields = ('spin_speed', 'spin_time', 'spin_acceleration')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["spin_speed"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Enter spin speed in rpm"})
+        self.fields["spin_time"].widget.attrs.update(
+            {"class": "form-control",  "placeholder": "Enter spin time in seconds"})
+        self.fields["spin_acceleration"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Enter spin acceleration in rpm"})
+
+
+class SpinProgramForm(forms.ModelForm):
+    class Meta:
+        model = SpinProgram
+        fields = ('name', 'program')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Give a name to the program"})
+        self.fields["program"].widget.attrs.update(
+            {"class": "form-select", "placeholder": "Select spin steps"})

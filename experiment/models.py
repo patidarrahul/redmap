@@ -162,3 +162,95 @@ class IngredientQuantity(models.Model):
 
     def __str__(self):
         return f'{self.inventory.item.name}, {self.quantity} {self.measurement_unit.name} on {self.updated}'
+
+class Layer(models.Model):
+
+    added_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, default='')
+
+    name = models.CharField(max_length=100)
+    coating_method_choices = (
+        ('Spin Coating', 'Spin Coating'),
+        ('Thermal Evaporation', 'Thermal Evaporation'),
+    )
+    coating_method = models.CharField(
+        max_length=100, choices=coating_method_choices)
+
+    layer_type = models.CharField(max_length=100)
+
+    formulation = models.ForeignKey(Formulation, on_delete=models.CASCADE)
+    completed = models.BooleanField(default=False)
+
+    created = models.DateTimeField()
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.coating_method} - Layer {self.name}'
+    
+class SpinStep(models.Model):
+    spin_speed = models.IntegerField()
+    spin_acceleration = models.IntegerField()
+    spin_time = models.IntegerField()
+
+    class Meta:
+        verbose_name_plural = '9.Spin Steps'
+
+    def __str__(self):
+        return f'Speed-{self.spin_speed} rpm, Acc-{self.spin_acceleration} rpm, {self.spin_time} s'
+
+
+class SpinProgram(models.Model):
+    name = models.CharField(max_length=100, default='')
+    program = models.ManyToManyField(SpinStep)
+
+    class Meta:
+        verbose_name_plural = '10.Spin Program'
+
+    def __str__(self):
+        return self.name
+
+
+class SpinCoatingCondition(models.Model):
+
+    added_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, default='')
+
+    layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
+
+    program = models.ForeignKey(SpinProgram, on_delete=models.CASCADE)
+
+    formulation_volume = models.FloatField()
+
+    antisolvent_used = models.BooleanField(default=False)
+    antisolvent = models.ForeignKey(
+        Inventory, on_delete=models.SET_NULL, null=True, blank=True)
+    antisolvent_volume = models.FloatField(null=True, blank=True)
+    antisolvent_drop_time = models.IntegerField(null=True, blank=True)
+
+    room_temperature = models.IntegerField()
+    room_humidity = models.IntegerField()
+
+    atmosphere = models.CharField(max_length=50)
+
+    drying_type = models.CharField(
+        max_length=50, null=True, blank=True)
+    drying_temperature = models.IntegerField(null=True, blank=True)
+    drying_time = models.IntegerField(null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = 'Spin Conditions'
+
+    def __str__(self):
+        return f'Spin Coated {self.layer.name}'
+
+
+
+class ThermalEvaporationCondition(models.Model):
+    added_by = models.ForeignKey(
+        User, on_delete=models.CASCADE)
+    layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
+    pressure = models.FloatField()

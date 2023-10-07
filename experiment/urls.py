@@ -36,4 +36,20 @@ urlpatterns = [
     path('formulation/update/<str:pk>/', views.updateformulationView,
          name='update-formulation'),
 
+    path('layer/route/<str:pk>/', views.layerRouter, name='layer-router'),
+    path('layer/', views.LayerView.as_view(), name='layer'),
+    path('layer/spin-coated-layer/add',
+         views.addSpinCoatedLayer, name='add-spin-coated-layer'),
+    path('layer/spin-coated-layer/update/<str:pk>/',
+         views.updateSpinCoatedLayer, name='update-spin-coated-layer'),
+
+    path('layer/spin-coated-layer/spin-program/add',
+         views.addSpinProgram, name='add-spin-program'),
+    path('layer/spin-coated-layer/spin-step/add',
+         views.addSpinStep, name='add-spin-step'),
+    path('layer/thermal-evaporated-layer/add' , views.addThermalEvaporatedLayerView, name='add-thermal-evaporated-layer'),
+    path('layer/thermal-evaporated-layer/update/<str:pk>/' , views.updateThermalEvaporatedLayerView, name='update-thermal-evaporated-layer'),
+
+    
+
 ]

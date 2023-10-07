@@ -14,13 +14,13 @@ from django.views.generic.list import ListView
 from django.urls import reverse_lazy
 
 from django.forms.models import BaseModelForm
-from .forms import InventoryForm, ItemForm, SupplierForm
+from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinStepForm
 
 
 
 
 
-from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity
+from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition 
 
 # Create your views here.
 
@@ -365,3 +365,264 @@ def updateformulationView(request, pk):
     context = {'formulation': formulation,
                'ingredients': ingredients, 'inventory_list': inventory_list, 'measurement_units': measurement_units, }
     return render(request, 'update-formulation.html', context)
+
+
+#layer page views
+
+@login_required(login_url = 'sign-in')
+def layerRouter(request, pk):
+    layer = Layer.objects.get(id=pk)
+    print(layer.coating_method)
+    if layer.coating_method == 'Spin Coating':
+        return redirect('update-spin-coated-layer', pk)
+    elif layer.coating_method == 'Thermal Evaporation':
+        return redirect('update-thermal-evaporated-layer', pk)
+    
+
+
+class LayerView(LoginRequiredMixin,ListView):
+    login_url = 'sign-in'
+    model = Layer
+    template_name = 'layer.html'
+    queryset = Layer.objects.all()
+    context_object_name = 'layer_list'
+
+@login_required(login_url = 'sign-in')
+def addSpinCoatedLayer(request):
+
+    if request.method == 'POST':
+        layer_type = request.POST.get('layer-type')
+        name = request.POST.get('name')
+        formulation = request.POST.get('formulation')
+        program = request.POST.get('program-id')
+        formulation_volume = request.POST.get('formulation-volume')
+
+        antisolvent_used = request.POST.get('antisolvent-used')
+        antisolvent = request.POST.get('antisolvent')
+        antisolvent_volume = request.POST.get('antisolvent-volume')
+        antisolvent_drop_time = request.POST.get('antisolvent-drop-time')
+
+        room_temperature = request.POST.get('room-temperature')
+        room_humidity = request.POST.get('room-humidity')
+        atmosphere = request.POST.get('atmosphere')
+
+        drying_type = request.POST.get('drying-type')
+        drying_temperature = request.POST.get('drying-temperature')
+        drying_time = request.POST.get('drying-time')
+
+        created = request.POST.get('created')
+
+        layer = Layer.objects.create(added_by=request.user, name=name, coating_method='Spin Coating', layer_type=layer_type,
+                                     formulation=Formulation.objects.get(id=formulation), created=created)
+
+        if antisolvent_used == 'True':
+            antisolvent_used = True
+
+            SpinCoatingCondition.objects.create(added_by=request.user, layer=layer,
+                                                program=SpinProgram.objects.get(id=program), formulation_volume=formulation_volume,
+                                                antisolvent_used=antisolvent_used, antisolvent=Inventory.objects.get(
+                                                    id=antisolvent),
+                                                antisolvent_volume=antisolvent_volume, antisolvent_drop_time=antisolvent_drop_time,
+                                                room_temperature=room_temperature, room_humidity=room_humidity, atmosphere=atmosphere,
+                                                drying_type=drying_type, drying_temperature=drying_temperature,
+                                                drying_time=drying_time)
+
+        else:
+            antisolvent_used = False
+            SpinCoatingCondition.objects.create(added_by=request.user, layer=layer,
+                                                program=SpinProgram.objects.get(id=program), formulation_volume=formulation_volume,
+                                                antisolvent_used=antisolvent_used,
+                                                room_temperature=room_temperature, room_humidity=room_humidity, atmosphere=atmosphere,
+                                                drying_type=drying_type, drying_temperature=drying_temperature,
+                                                drying_time=drying_time)
+
+        messages.success(request, 'Layer added successfully')
+        return redirect('layer')
+    programs = SpinProgram.objects.all()
+    formulations = Formulation.objects.filter(completed=False)
+    inventory_list = Inventory.objects.filter(
+        item__type='Liquid', completed=False)
+
+    context = {'programs': programs,
+               'formulations': formulations, 'inventory_list': inventory_list}
+
+    return render(request, 'add-spin-coated-layer.html', context)
+
+
+
+@login_required(login_url = 'sign-in')
+def updateSpinCoatedLayer(request, pk):
+    # values for context
+    layer = Layer.objects.get(id=pk)
+    condition = SpinCoatingCondition.objects.get(layer=layer)
+    programs = SpinProgram.objects.all()
+    formulations = Formulation.objects.filter(completed=False)
+    inventory_list = Inventory.objects.filter(
+        item__type='Liquid', completed=False)
+
+    if condition.antisolvent_used == True:
+        antisolvent_used = 'Yes'
+    else:
+        antisolvent_used = 'No'
+
+    if request.method == 'POST':
+
+        # getting ation value for save as new or update
+        action = request.POST.get('action')
+
+        # values for update or save as new
+        layer_type = request.POST.get('layer-type')
+        name = request.POST.get('name')
+        formulation = request.POST.get('formulation')
+        program = request.POST.get('program-id')
+        formulation_volume = request.POST.get('formulation-volume')
+
+        antisolvent__used = request.POST.get('antisolvent-used')
+        antisolvent = request.POST.get('antisolvent')
+        antisolvent_volume = request.POST.get('antisolvent-volume')
+        antisolvent_drop_time = request.POST.get('antisolvent-drop-time')
+
+        room_temperature = request.POST.get('room-temperature')
+        room_humidity = request.POST.get('room-humidity')
+        atmosphere = request.POST.get('atmosphere')
+
+        drying_type = request.POST.get('drying-type')
+        drying_temperature = request.POST.get('drying-temperature')
+        drying_time = request.POST.get('drying-time')
+
+        created = request.POST.get('created')
+
+        if action == 'save-as-new':
+            print('save as new')
+
+            layer = Layer.objects.create(added_by=request.user, name=name, coating_method='Spin Coating',
+                                         layer_type=layer_type, formulation=Formulation.objects.get(
+                                             id=formulation),
+                                         created=created)
+
+            if antisolvent__used == 'True':
+                antisolvent__used = True
+
+                SpinCoatingCondition.objects.create(added_by=request.user, layer=layer,
+                                                    program=SpinProgram.objects.get(id=program), formulation_volume=formulation_volume,
+                                                    antisolvent_used=antisolvent__used, antisolvent=Inventory.objects.get(
+                                                        id=antisolvent),
+                                                    antisolvent_volume=antisolvent_volume, antisolvent_drop_time=antisolvent_drop_time,
+                                                    room_temperature=room_temperature, room_humidity=room_humidity, atmosphere=atmosphere,
+                                                    drying_type=drying_type, drying_temperature=drying_temperature,
+                                                    drying_time=drying_time)
+
+            else:
+                antisolvent__used = False
+                SpinCoatingCondition.objects.create(added_by=request.user, layer=layer,
+                                                    program=SpinProgram.objects.get(id=program), formulation_volume=formulation_volume,
+                                                    antisolvent_used=antisolvent__used,
+                                                    room_temperature=room_temperature, room_humidity=room_humidity, atmosphere=atmosphere,
+                                                    drying_type=drying_type, drying_temperature=drying_temperature,
+                                                    drying_time=drying_time)
+
+            messages.success(request, f'{name} layer added successfully')
+
+            return redirect('layer')
+
+        elif action == 'update':
+
+            try:
+                layer.layer_type = layer_type
+                layer.name = name
+                layer.formulation = Formulation.objects.get(id=formulation)
+                layer.created = created
+
+                condition.program = SpinProgram.objects.get(id=program)
+                condition.formulation_volume = formulation_volume
+                condition.antisolvent_used = antisolvent__used
+                if condition.antisolvent_used == True:
+                    condition.antisolvent = Inventory.objects.get(
+                        id=antisolvent)
+                    condition.antisolvent_volume = antisolvent_volume
+                    condition.antisolvent_drop_time = antisolvent_drop_time
+                condition.room_temperature = room_temperature
+                condition.room_humidity = room_humidity
+                condition.atmosphere = atmosphere
+                condition.drying_type = drying_type
+                condition.drying_temperature = drying_temperature
+                condition.drying_time = drying_time
+                layer.save()
+                condition.save()
+                messages.success(request, f'{name} layer updated successfully')
+            except:
+                messages.error(request, 'Layer could not be updated')
+
+            return redirect('layer')
+
+    context = {'layer': layer, 'programs': programs,
+               'formulations': formulations, 'inventory_list': inventory_list, 'antisolvent_used': antisolvent_used, 'condition': condition}
+    return render(request, 'update-spin-coated-layer.html', context)
+
+@login_required(login_url = 'sign-in')
+def addSpinStep(request):
+
+    form = SpinStepForm()
+
+    if request.method == 'POST':
+        form = SpinStepForm(request.POST)
+        if SpinStep.objects.filter(spin_speed=request.POST.get('spin_speed'), spin_time=request.POST.get('spin_time'), spin_acceleration=request.POST.get('spin_acceleration')).exists():
+            messages.error(
+                request, 'Spin step already exists, please use the existing spin step')
+        elif form.is_valid():
+            form.save()
+            return redirect('add-spin-program')
+
+    context = {'form': form}
+    return render(request, 'spin-step.html', context)
+
+@login_required(login_url = 'sign-in')
+def addSpinProgram(request):
+
+    form = SpinProgramForm()
+    if request.method == 'POST':
+        form = SpinProgramForm(request.POST)
+    
+        if form.is_valid():
+            form.save()
+            return redirect('add-spin-coated-layer')
+
+    context = {'form': form}
+    return render(request, 'spin-program.html', context)
+
+
+def addThermalEvaporatedLayerView(request):
+    formulation_list = Formulation.objects.filter(completed=False)
+    context = {'formulation_list': formulation_list}
+    if request.method == 'POST':
+        layer_type = request.POST.get('layer-type')
+        name = request.POST.get('name')
+        formulation = request.POST.get('formulation')
+        pressure = request.POST.get('pressure')
+        created = request.POST.get('created')
+        layer = Layer.objects.create(added_by=request.user, name=name, coating_method='Thermal Evaporation', layer_type=layer_type,
+                                     formulation=Formulation.objects.get(id=formulation), created=created)
+        
+        ThermalEvaporationCondition.objects.create(added_by=request.user, layer=layer, pressure=pressure)
+        
+        messages.success(request, 'Layer added successfully')
+        return redirect('layer')
+        
+    return render(request, 'add-thermal-evaporated-layer.html' , context)
+
+
+def updateThermalEvaporatedLayerView(request, pk):
+    layer = Layer.objects.get(id=pk)
+    condition = ThermalEvaporationCondition.objects.get(layer=layer)
+    if request.method == 'POST':
+        layer.layer_type = request.POST.get('layer-type')
+        layer.name = request.POST.get('name')
+        layer.formulation = Formulation.objects.get(id=request.POST.get('formulation'))
+        layer.created = request.POST.get('created')
+        layer.save()
+        condition.pressure = request.POST.get('pressure')
+        condition.save()
+        messages.success(request, 'Layer updated successfully')
+        return redirect('layer')
+    context = {'layer': layer, 'condition': condition}
+    return render(request, 'update-thermal-evaporated-layer.html', context)

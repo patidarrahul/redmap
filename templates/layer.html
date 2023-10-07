@@ -1,0 +1,73 @@
+{% extends 'base.html'%} {% load static %} {% block content %}
+
+<div class="container-fluid mx-auto" style="position: absolute; top: 40px">
+  <div class="mt-4">
+    <a
+      href="{% url 'add-spin-coated-layer' %}"
+      type="button"
+      class="btn btn-outline-primary col-md-3"
+    >
+      Add Spin Coated Layer
+    </a>
+    <a
+      href="{% url 'add-thermal-evaporated-layer' %}"
+      type="button"
+      class="btn btn-outline-primary col-md-4"
+    >
+      Add Thermal Evaporated layer
+    </a>
+    <button type="button" class="btn btn-outline-success col-md-2" id="update-selected">
+      Update Selected
+    </button>
+  </div>
+  <div class="card shadow mt-4">
+ 
+    <div class="card-body">
+      <h4 class="mb-4">Layers</h4>
+      <div class="table-responsive">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>ID</th>
+              <th>Added By</th>
+              <th>Name</th>
+              <th>Layer Type</th>
+              <th>Formulation</th>
+              <th>Coating Method</th>
+              <th>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for layer in layer_list %}
+
+            <tr>
+              <td>
+                <input type="checkbox" name="selected_layer" value="{{ layer.id }}" />
+              </td>
+              <td>{{ layer.id }}</td>
+              <td>{{ layer.added_by }}</td>
+              <td>{{ layer.name }}</td>
+              <td>{{layer.layer_type}}</td>
+              <td>
+                <a href="{% url 'update-formulation' layer.formulation.id %}"
+                  >{{layer.formulation.name}}
+                </a>
+              </td>
+              <td>{{layer.coating_method}}</td>
+
+              <td>{{ layer.created |date:'D, d M Y' }}</td>
+            </tr>
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src = "{% static 'js/layer.js' %}"></script>
+
+{% endblock content %}

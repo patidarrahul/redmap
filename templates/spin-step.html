@@ -1,0 +1,24 @@
+{% extends 'base.html'%} {% load static %} {% block content %}
+
+<div class="container-fluid mx-auto" style="width : 50%; position: absolute; top: 40px;">
+  <div class="card shadow" >
+    
+    <div class="card-body">
+      <h4 class="mb-4">Add Spin Step </h4>
+      <form class="row form-group" method="POST" action="">
+        {% csrf_token %}
+
+        <div class="col px-5">
+          <div class="row mt-2">{{form.spin_speed}}</div>
+          <div class="row mt-2">{{form.spin_acceleration}}</div>
+          <div class="row mt-2 mb-3">{{form.spin_time}}</div>
+        </div>
+
+        <input type="submit" class="btn btn-outline-primary" value="Add Spin Speed" />
+      </form>
+    </div>
+    {% endblock content%}
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src = "{% static 'js/layer.js' %}"></script>
