@@ -4,10 +4,22 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.list import ListView
+
+from django.urls import reverse_lazy
+
+from django.forms.models import BaseModelForm
+from .forms import InventoryForm, ItemForm, SupplierForm
 
 
 
-from .models import UserProfile
+
+
+from .models import UserProfile, Inventory
 
 # Create your views here.
 
@@ -125,3 +137,101 @@ def signOutView(request):
     logout(request)
     messages.success(request, f'You have been logged out.')
     return redirect('sign-in')
+
+
+# defining inventoryView, addInventoryView, updateInventoryView for inventory page 
+
+class inventoryView(LoginRequiredMixin,ListView):
+
+    login_url = 'sign-in'
+    model = Inventory
+    template_name = 'inventory.html'
+    queryset = Inventory.objects.filter(completed=False)
+    context_object_name = 'inventory_list'
+
+class addInventoryView(LoginRequiredMixin,CreateView):
+    login_url = 'sign-in'
+    model = Inventory
+    template_name = 'add-inventory.html'
+    success_url = reverse_lazy('inventory')
+    form_class = InventoryForm
+
+    """
+    Get the context data for the view.
+
+    :param kwargs: Additional keyword arguments to pass to the superclass method.
+    :return: The context data containing the 'items' and 'measurement_units'.
+    """
+
+    def form_valid(self, form):
+        form.instance.added_by = self.request.user
+        messages.success(self.request, 'Inventory added successfully')
+        return super().form_valid(form)
+
+    def form_invalid(self, form: BaseModelForm) -> HttpResponse:
+        return super().form_invalid(form)
+
+
+class updateInventoryView(LoginRequiredMixin,UpdateView):
+    login_url = 'sign-in'
+    model = Inventory
+    template_name = 'update-inventory.html'
+    form_class = InventoryForm
+    success_url = reverse_lazy('inventory')
+
+    def form_valid(self, form):
+        action = self.request.POST.get('action')
+        if action == 'save-as-new':
+            new_instance = form.save(commit=False)
+            new_instance.id = None
+            new_instance.added_by = self.request.user
+            new_instance.save()
+            # Add success message
+            messages.success(self.request, 'Saved as new successfully.')
+            return super().form_valid(form)
+        elif action == 'update':
+            # Add success message
+            messages.success(self.request, 'Update successful.')
+            return super().form_valid(form)
+
+@login_required(login_url = 'sign-in')
+def markascomplete(request, pk):
+    inventory = Inventory.objects.get(id=pk)
+    inventory.completed = True
+    inventory.save()
+    messages.success(
+        request, f'{inventory.item.name} {inventory.batch} marked as complete')
+    return redirect('inventory')
+
+@login_required(login_url = 'sign-in')
+def addItemView(request):
+    form = ItemForm()
+    if request.method == 'POST':
+        form = ItemForm(request.POST)
+        if form.is_valid():
+            form_instance = form.save(commit=False)
+            form_instance.added_by = request.user
+            form_instance.save()
+            form.save()
+            messages.success(request, 'Item added successfully')
+            return redirect('add-inventory')
+    context = {
+        'form': form,
+    }
+    return render(request, 'add-item.html', context)
+
+@login_required(login_url = 'sign-in')
+def addSupplierView(request):
+    form = SupplierForm()
+    if request.method == 'POST':
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            form_instance = form.save(commit=False)
+            form_instance.added_by = request.user
+            form_instance.save()
+            messages.success(request, 'Supplier added successfully')
+            return redirect('add-item')
+    context = {
+        'form': form,
+    }
+    return render(request, 'add-supplier.html', context)
