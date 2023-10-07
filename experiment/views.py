@@ -14,13 +14,13 @@ from django.views.generic.list import ListView
 from django.urls import reverse_lazy
 
 from django.forms.models import BaseModelForm
-from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinStepForm
+from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinStepForm, AddStackForm
 
 
 
 
 
-from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition 
+from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition, Stack, StackLayerRelationShip
 
 # Create your views here.
 
@@ -626,3 +626,89 @@ def updateThermalEvaporatedLayerView(request, pk):
         return redirect('layer')
     context = {'layer': layer, 'condition': condition}
     return render(request, 'update-thermal-evaporated-layer.html', context)
+
+class StackView(LoginRequiredMixin,ListView):
+    login_url = 'sign-in'
+    model = Stack
+    template_name = 'stack.html'
+
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        stack_list = Stack.objects.all()
+
+        kwargs['stack_list'] = stack_list
+        kwargs['realted_stacks'] = StackLayerRelationShip.objects.all()
+
+        for stack in stack_list:
+            print(stack.layers.all())
+            for layer in stack.layers.all():
+                print(layer)
+                print(type(layer))
+        return super().get_context_data(**kwargs)
+
+@login_required(login_url = 'sign-in')
+def addStackView(request):
+
+    layer_list = Layer.objects.all()
+    form = AddStackForm
+    if request.method == 'POST':
+        selected_layers = request.POST.get("selected-layers")
+        selected_layers_list = selected_layers.split(
+            ",")     # Split the selected values into a list
+        form = AddStackForm(request.POST)
+        if form.is_valid():
+            form.instance.added_by = request.user
+            form_instance = form.save(commit=False)
+            form.save()
+
+            for layer in selected_layers_list:
+                StackLayerRelationShip.objects.create(
+                    stack=form_instance, layer=Layer.objects.get(id=layer))
+
+            messages.success(request, 'Stack added successfully')
+            return redirect('stack')
+        else:
+            messages.error(request, 'Stack could not be added')
+
+    context = {'layer_list': layer_list, 'form': form}
+    return render(request, 'add-stack.html', context)
+
+@login_required(login_url = 'sign-in')
+def updateStackView(request, pk):
+    stack = Stack.objects.get(id=pk)
+    substrate = Inventory.objects.get(id=stack.substrate.id)
+    layers = stack.layers.all().order_by('-stacklayerrelationship__added_at')
+    layer_list = Layer.objects.all()
+    form = AddStackForm(instance=stack)
+    selectedValues = [
+        i.id for i in stack.layers.all().order_by('stacklayerrelationship__added_at')]
+    selectedValues = ','.join([str(i) for i in selectedValues])
+
+    if request.method == 'POST':
+        form = AddStackForm(request.POST, instance=stack)
+
+        if form.is_valid():
+            print('form is valid')
+            selected_layers = request.POST.get("selected-layers")
+            selected_layers_list = selected_layers.split(
+                ",")
+            form.instance.added_by = request.user
+            form_instance = form.save(commit=False)
+            form.save()
+
+            for layer in StackLayerRelationShip.objects.filter(stack=stack):
+                layer.delete()
+            for layer in selected_layers_list:
+                StackLayerRelationShip.objects.create(
+                    stack=form_instance, layer=Layer.objects.get(id=layer))
+            messages.success(request, 'Stack updated successfully')
+            return redirect('stack')
+        else:
+            print(form.errors)
+            messages.error(request, 'Stack could not be updated')
+
+    context = {'form': form,
+               'substrate': substrate, 'stack': stack,
+               'layers': layers, 'selectedValues': selectedValues, 'layer_list': layer_list}
+
+    return render(request, 'update-stack.html', context)

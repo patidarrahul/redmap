@@ -30,6 +30,37 @@ class UserProfile(models.Model):
         upload_to = user_profile_path, blank=True, null=True)
     
 
+class Project(models.Model):
+    title = models.CharField(max_length=20)
+    description = models.TextField()
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE)
+    collaborators = models.ManyToManyField(
+        User, related_name='collaborators')
+
+    created = models.DateTimeField()
+    upated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = 'Projects'
+        ordering = ['-created']
+    def __str__(self):
+        return self.title
+
+
+class Experiment(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    objective = models.CharField(max_length=200)
+    notes = models.TextField()
+    created = models.DateTimeField()
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = 'Experiments'
+        ordering = ['-created']
+    def __str__(self):
+        return "Expreiment ID:{} {}".format(self.id, self.objective[:20])
 
 class Category(models.Model):
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -254,3 +285,51 @@ class ThermalEvaporationCondition(models.Model):
         User, on_delete=models.CASCADE)
     layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
     pressure = models.FloatField()
+
+
+
+class Stack(models.Model):
+    added_by = models.ForeignKey(
+        User, on_delete=models.CASCADE)
+
+    experiment = models.ForeignKey(
+        Experiment, on_delete=models.CASCADE)
+
+    name = models.CharField(max_length=100)
+    substrate = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    geometry_choices = (
+        ('N-I-P', 'N-I-P'),
+        ('P-I-N', 'P-I-N'),
+        ('Power-Roll', 'Power-Roll'),
+        ('Other', 'Other')
+    )
+    geometry = models.CharField(
+        max_length=100, choices=geometry_choices)
+    layers = models.ManyToManyField(Layer, through='StackLayerRelationShip')
+
+    number_of_layers = models.IntegerField(default=0)
+    number_of_devices = models.IntegerField(default=0)
+
+    completed = models.BooleanField(default=False)
+
+    created = models.DateTimeField()
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = '11.Stacks'
+        ordering = ['-updated', '-created']
+
+    def __str__(self):
+        return self.name
+
+
+class StackLayerRelationShip(models.Model):
+    stack = models.ForeignKey(Stack, on_delete=models.CASCADE)
+    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
+    
+
+    added_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = '12.StackLayerRelationShip'
+        ordering = ['-added_at']

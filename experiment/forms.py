@@ -67,3 +67,24 @@ class SpinProgramForm(forms.ModelForm):
             {"class": "form-control", "placeholder": "Give a name to the program"})
         self.fields["program"].widget.attrs.update(
             {"class": "form-select", "placeholder": "Select spin steps"})
+        
+class AddStackForm(forms.ModelForm):
+    class Meta:
+        model = Stack
+        fields = ['name', 'geometry', 'substrate',
+                  'number_of_layers', 'number_of_devices',  'created', 'experiment']
+
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'substrate': forms.Select(attrs={'class': 'form-select', 'id': 'substrate'}),
+            'geometry': forms.Select(attrs={'class': 'form-select', 'required': 'required'}),
+            'number_of_layers': forms.NumberInput(attrs={'class': 'form-control', 'required': 'required'}),
+            'created': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'number_of_devices': forms.NumberInput(attrs={'class': 'form-control', 'required': 'required'}),
+            'experiment': forms.Select(attrs={'class': 'form-select', 'required': 'required'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['substrate'].queryset = Inventory.objects.filter(
+            item__category__name='Substrate')

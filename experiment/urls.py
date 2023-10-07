@@ -50,6 +50,9 @@ urlpatterns = [
     path('layer/thermal-evaporated-layer/add' , views.addThermalEvaporatedLayerView, name='add-thermal-evaporated-layer'),
     path('layer/thermal-evaporated-layer/update/<str:pk>/' , views.updateThermalEvaporatedLayerView, name='update-thermal-evaporated-layer'),
 
-    
+# stack urls 
+     path('stack/', views.StackView.as_view(), name='stack'),
+    path('stack/add/', views.addStackView, name='add-stack'),
+    path('stack/update/<str:pk>/', views.updateStackView, name='update-stack'),
 
 ]

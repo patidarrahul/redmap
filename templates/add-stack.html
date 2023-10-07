@@ -1,0 +1,85 @@
+{% extends 'base.html'%} {% load static %} {% block content %}
+
+<div class="container-fluid mx-auto" style="position: absolute; top: 40px">
+  <div class="card mt-4 shadow " style="border-radius: 15px">
+
+    <div class="card-body">
+      <h4 class="mb-4">Create a Stack</h4>
+      <form class="col-12 g-3" method="POST" , action="">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-3">
+            <label for="name" class="form-label">Experiment</label>
+            {{ form.experiment }}
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-4">
+            <label for="name" class="form-label">Name</label>
+            {{ form.name }}
+          </div>
+          <div class="col-md-2">
+            <label for="name" class="form-label">Geometry</label>
+            {{ form.geometry }}
+          </div>
+          <div class="col-md-2">
+            <label for="name" class="form-label">Substrate</label>
+            {{ form.substrate }}
+          </div>
+          <div class="col-md-2">
+            <label for="name" class="form-label">Number of Layers</label>
+            {{ form.number_of_layers }}
+          </div>
+          <div class="col-md-2">
+            <label for="name" class="form-label">Number of Devices</label>
+            {{ form.number_of_devices }}
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-2">
+            <label for="name" class="form-label">Date Made</label>
+            {{ form.created }}
+          </div>
+          <div class="col-md-4">
+            <label for="layer-type" class="form-label">Select Layers</label>
+            <input type="hidden" id="selectedValues" name="selected-layers" value="" />
+
+            <select id="layers" class="form-select" name="layers" required>
+              <option disabled selected>Choose...</option>
+              {% for layer in layer_list %}
+              <option value="{{layer.id}}">{{ layer.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <hr class="mt-4 shadow-lg" />
+          <div class="row mt-2 d-flex justify-content-center align-items-center mx-auto">
+            <div class="col-md-6">
+              <h2
+                class="d-flex justify-content-center mx-auto"
+                style="color: #404040; font-family: system-ui"
+              >
+                Stack
+              </h2>
+              <!-- Layers Button to be added -->
+              <div class="row shadow-lg col-md-8 mx-auto" id="layerContainer"></div>
+              <!-- Substrate to be added  -->
+              <div class="row mx-auto" id="deviceStack"></div>
+
+              <button
+                type="submit"
+                class="btn btn-outline-primary mt-4 d-flex justify-content-center mx-auto"
+              >
+                Add to Database
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/stack.js' %}"></script>
+
+{%endblock%}
