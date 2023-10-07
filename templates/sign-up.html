@@ -9,11 +9,12 @@
 
     <title>Document</title>
   </head>
-  <body>
+  <body style = 'padding-left: 0;'>
     {%if messages%}
     <div
       class="alert alert-info alert-dismissible fade show col-md-4 mx-auto mt-4 text-center"
       role="alert"
+      style = 'width : 50%'
     >
       {% for message in messages %}
       <h6>{{ message }}</h6>
