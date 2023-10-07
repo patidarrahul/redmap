@@ -1,0 +1,79 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div class="container-fluid mx-auto" style="position: absolute; top: 40px; max-width: 90%">
+  <div>
+    <a
+      href="{% url 'add-formulation' %}"
+      type="button"
+      class="btn btn-outline-primary mt-2 col-md-2"
+      id="add-new"
+    >
+      Add New
+    </a>
+    
+
+    <button
+      class="btn btn-outline-success mt-4 mb-3 w-120 update-selected-btn"
+      type="button"
+      style="padding-left: 25px; padding-right: 25px"
+    >
+      Update Selected
+    </button>
+    <button
+      class="btn btn-outline-danger mt-4 mb-3 w-120 mark-complete-selected-btn"
+      type="button"
+      style="padding-left: 25px; padding-right: 25px"
+    >
+      Mark As Compelete
+    </button>
+  </div>
+
+  <div class="card mb-4 mt-4 shadow">
+ 
+    <div class="card-body">
+      <h4>Formulations</h4>
+      <div class="tabel-responsive">
+        <table class="table text-center mt-4">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>ID</th>
+              <th>Added By</th>
+              <th>Name</th>
+              <th>Ingredients and Quantity</th>
+              <th>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for formulation in formulation_list %}
+
+            <tr>
+              <td>
+                <input type="checkbox" name="selected_formulation" value="{{ formulation.id }}" />
+              </td>
+              <td>{{ formulation.id }}</td>
+              <td>{{ formulation.added_by }}</td>
+              <td>
+                <a href="{% url 'update-formulation' formulation.id %}">{{ formulation.name }}</a>
+              </td>
+              <td>
+                {% for ingredient in formulation.ingredients.all %} {{ingredient.item.name}}
+                <br />
+                {%endfor %}
+              </td>
+              <td>{{ formulation.created |date:'D, d M Y' }}</td>
+            </tr>
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="{% static 'js/formulation.js' %}"> </script>
+
+{% endblock content %}

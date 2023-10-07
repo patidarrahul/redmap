@@ -123,3 +123,42 @@ class Inventory(models.Model):
 
     def __str__(self):
         return f'{self.item.name} ({self.batch} )'
+
+
+class Formulation(models.Model):
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    ingredients = models.ManyToManyField(
+        Inventory, through='IngredientQuantity')
+    name = models.CharField(max_length=200)
+    atmosphere = models.CharField(max_length=10)
+    notes = models.TextField(null=True, blank=True)
+    created = models.DateTimeField()
+    completed = models.BooleanField(default=False)
+
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = '8.Formulations'
+        ordering = ['-updated', '-created']
+
+    def __str__(self):
+        return self.name
+
+
+class IngredientQuantity(models.Model):
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    formulation = models.ForeignKey(Formulation, on_delete=models.CASCADE)
+    quantity = models.FloatField()
+    measurement_unit = models.ForeignKey(
+        MeasurementUnit, on_delete=models.SET_NULL, null=True, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = '7.Formulation Ingredients'
+        ordering = ['-updated', '-created']
+
+    def __str__(self):
+        return f'{self.inventory.item.name}, {self.quantity} {self.measurement_unit.name} on {self.updated}'

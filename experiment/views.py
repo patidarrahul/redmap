@@ -1,4 +1,5 @@
 import os
+from typing import Any
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -19,7 +20,7 @@ from .forms import InventoryForm, ItemForm, SupplierForm
 
 
 
-from .models import UserProfile, Inventory
+from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity
 
 # Create your views here.
 
@@ -235,3 +236,132 @@ def addSupplierView(request):
         'form': form,
     }
     return render(request, 'add-supplier.html', context)
+
+
+#formulation page views
+
+class formulationView(LoginRequiredMixin,ListView):
+    login_url = 'sign-in'
+    model = Formulation
+    template_name = 'formulation.html'
+    queryset = Formulation.objects.filter(completed=False)
+    context_object_name = 'formulation_list'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['IngredientQuantity'] = IngredientQuantity.objects.all()
+        return context
+
+@login_required(login_url = 'sign-in')
+def addformulationView(request):
+
+    if request.method == 'POST':
+        added_by = request.user
+        name = request.POST.get('formulation-name')
+        atmosphere = request.POST.get('atmosphere')
+
+        created = request.POST.get('formulation-created')
+        notes = request.POST.get('notes')
+
+        formulation = Formulation.objects.create(added_by=added_by,
+                                                 name=name, atmosphere=atmosphere, notes=notes, created=created)
+
+        inventory_ids = request.POST.getlist('inventory-name[]')
+        quantities = request.POST.getlist('quantity[]')
+        measurement_units_ids = request.POST.getlist('measurement-unit[]')
+
+        for i in range(len(inventory_ids)):
+            IngredientQuantity.objects.create(added_by=added_by, formulation=formulation, inventory=Inventory.objects.get(
+                id=inventory_ids[i]), quantity=quantities[i], measurement_unit=MeasurementUnit.objects.get(id=measurement_units_ids[i]))
+
+        messages.success(request, 'Formulation added successfully')
+        return redirect('formulation')
+
+    inventory_list = Inventory.objects.filter(
+        completed=False, item__category__name='Material')
+    measurement_units = MeasurementUnit.objects.all()
+    context = {'inventory_list': inventory_list, 'measurement_units': measurement_units,
+               }
+    return render(request, 'add-formulation.html', context)
+
+@login_required(login_url = 'sign-in')
+def updateformulationView(request, pk):
+    formulation = Formulation.objects.get(id=pk)
+    ingredients = IngredientQuantity.objects.filter(
+        formulation=formulation)
+    inventory_list = Inventory.objects.filter(
+        completed=False, item__category__name='Material')
+    measurement_units = MeasurementUnit.objects.all()
+
+    added_by = request.user
+    name = request.POST.get('formulation-name')
+    atmosphere = request.POST.get('atmosphere')
+    created = request.POST.get('formulation-created')
+    notes = request.POST.get('notes')
+
+    inventory_ids = request.POST.getlist('inventory-name[]')
+    quantities = request.POST.getlist('quantity[]')
+    measurement_units_ids = request.POST.getlist('measurement-unit[]')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'save-as-new':
+            new_formulation = Formulation.objects.create(added_by=added_by,
+                                                         name=name, atmosphere=atmosphere, notes=notes, created=created)
+
+            for i in range(len(inventory_ids)):
+                IngredientQuantity.objects.create(added_by=added_by, formulation=new_formulation, inventory=Inventory.objects.get(
+                    id=inventory_ids[i]), quantity=quantities[i], measurement_unit=MeasurementUnit.objects.get(id=measurement_units_ids[i]))
+            messages.success(request, 'New Formulation has been added')
+            return redirect('formulation')
+        elif action == 'update':
+            formulation.name = name
+            formulation.atmosphere = atmosphere
+            formulation.notes = notes
+            formulation.save()
+            if len(ingredients) == len(inventory_ids):
+                for count, ingredient in enumerate(ingredients):
+                    ingredient.inventory = Inventory.objects.get(
+                        id=inventory_ids[count])
+                    ingredient.quantity = quantities[count]
+                    ingredient.measurement_unit = MeasurementUnit.objects.get(
+                        id=measurement_units_ids[count])
+                    ingredient.save()
+            # what if user adds more ingredients to the forumulation
+            elif len(ingredients) < len(inventory_ids):
+                # save the existing ingredients
+                for count, ingredient in enumerate(ingredients):
+                    ingredient.inventory = Inventory.objects.get(
+                        id=inventory_ids[count])
+                    ingredient.quantity = quantities[count]
+                    ingredient.measurement_unit = MeasurementUnit.objects.get(
+                        id=measurement_units_ids[count])
+                    ingredient.save()
+                for i in range(len(ingredients), len(inventory_ids)):  # add the new ingredients
+                    IngredientQuantity.objects.create(added_by=added_by, formulation=formulation, inventory=Inventory.objects.get(
+                        id=inventory_ids[i]), quantity=quantities[i], measurement_unit=MeasurementUnit.objects.get(id=measurement_units_ids[i]))
+
+            # what if user removes ingredients from the formulation
+
+            elif len(ingredients) > len(inventory_ids):
+                for i, ingredient in enumerate(ingredients):
+                    if i < len(inventory_ids):
+                        ingredient.inventory = Inventory.objects.get(
+                            id=inventory_ids[i])
+                        ingredient.quantity = quantities[i]
+                        ingredient.measurement_unit = MeasurementUnit.objects.get(
+                            id=measurement_units_ids[i])
+                        ingredient.save()
+                    elif i >= len(inventory_ids):
+                        ingredient.delete()
+
+            else:
+                messages.error(
+                    request, 'Formulation ingredients could not be updated')
+        messages.success(request, 'Formulation updated successfully')
+
+        return redirect('formulation')
+
+    context = {'formulation': formulation,
+               'ingredients': ingredients, 'inventory_list': inventory_list, 'measurement_units': measurement_units, }
+    return render(request, 'update-formulation.html', context)
