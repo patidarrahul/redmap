@@ -1,10 +1,8 @@
 {% extends 'base.html'%} {% block content %}
 
 <div class="container-fluid mx-auto" style="position: absolute; top: 40px">
-  <div class="card mt-4">
-    <div class="card-header">
-      <h5>Thermal Evaporated Layer</h5>
-    </div>
+  <div class="card  shadow mt-4">
+
     <div class="card-body">
       <form class="col-12 g-3" method="POST" , action="">
         {% csrf_token %}
@@ -35,7 +33,7 @@
 
           <div class="col-md-4">
             <label for="formulation" class="formulation">Formulation</label>
-            <select id="formulation" class="form-select" name="formulation" required>
+            <select id="formulation" class="form-select mt-2" name="formulation" required>
               <option selected value="{{layer.formulation.id}}">
                 {{layer.formulation.name}}{{layer.formulation.created|date:'d-m-Y'}}
               </option>
