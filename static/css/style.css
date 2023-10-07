@@ -22,6 +22,11 @@ body{
 }
 a {
     text-decoration: none;
+    color : #c94890;
+}
+
+a:hover{
+    color : #c94890;
 }
 .header{
     width: 100%;
@@ -189,3 +194,9 @@ a {
     border-color: var(--first-color-light);
 }
 
+.profile-cover{
+    background-color: rgb(234, 168, 93);
+    background-image: url(../images/profile-cover.jpg);
+    border-radius: 15px;  
+    width: 90%; height: 200px;
+}

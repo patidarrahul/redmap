@@ -13,6 +13,8 @@ urlpatterns = [
     path('sign-up/', views.signUpView, name='sign-up'),
     path('sign-out/', views.signOutView, name='sign-out'),
 
+    path('profile/', views.profileView, name='profile'),
+
 
     path('reset-password/', auth_views.PasswordResetView.as_view(template_name='password-reset.html'), name='reset_password'),
     path('reset-password-sent/', auth_views.PasswordResetDoneView.as_view(template_name='password-reset-done.html') , name='password_reset_done'),
@@ -54,5 +56,7 @@ urlpatterns = [
      path('stack/', views.StackView.as_view(), name='stack'),
     path('stack/add/', views.addStackView, name='add-stack'),
     path('stack/update/<str:pk>/', views.updateStackView, name='update-stack'),
+
+     
 
 ]

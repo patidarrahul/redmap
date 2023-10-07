@@ -20,7 +20,7 @@ from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinS
 
 
 
-from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition, Stack, StackLayerRelationShip
+from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition, Stack, StackLayerRelationShip, Project
 
 # Create your views here.
 
@@ -138,6 +138,19 @@ def signOutView(request):
     logout(request)
     messages.success(request, f'You have been logged out.')
     return redirect('sign-in')
+
+@login_required(login_url = 'sign-in')
+def profileView(request):
+    user = request.user
+    projects = Project.objects.filter(author=user)
+
+    context = {
+        'user': user,
+        'projects': projects,
+    }
+    return render(request, 'profile.html', context)
+
+
 
 
 # defining inventoryView, addInventoryView, updateInventoryView for inventory page 
