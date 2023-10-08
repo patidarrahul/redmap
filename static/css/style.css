@@ -18,7 +18,7 @@ body{
     margin: var(--header-height) 0 0 0;padding: 0 1rem;
     font-family: var(--body-font);
     font-size: var(--normal-font-size);
-    transition: .5s
+    transition: 0.5s
 }
 a {
     text-decoration: none;
@@ -40,7 +40,7 @@ a:hover{
     padding: 0 1rem;
 
     
-    transition: .5s
+    transition: 0.5s
 }
     
 .header_toggle{
@@ -72,7 +72,7 @@ a:hover{
    
   
     padding: .5rem 1rem 0 0;
-    transition: .5s;
+    transition: 0.5s;
     z-index: var(--z-fixed)
 }
 

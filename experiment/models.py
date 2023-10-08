@@ -1,23 +1,35 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 # Create your models here.
-def user_profile_path(self, filename):
-        """
-        Generate the user profile path for a given filename.
+def user_profile_path(instance, filename):
+    """
+    Generate the user profile path for a given filename.
 
-        Args:
-            filename (str): The name of the file.
+    Args:
+        instance (UserProfile): The UserProfile instance.
+        filename (str): The name of the file.
 
-        Returns:
-            str: The path of the user's profile file.
-        """
-        username = self.user.username
-        ext = filename.split('.')[-1]
-    
+    Returns:
+        str: The path of the user's profile file.
+    """
+    username = instance.user.username
+    ext = filename.split('.')[-1]
 
-        return os.path.join('users', username, 'profile', f'{filename}')
+    # If a file with the same name exists, delete it
+    try:
+        old_file = UserProfile.objects.get(pk=instance.pk).profile_picture
+        if old_file:
+            # Delete the old file if it exists
+            if os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+    except UserProfile.DoesNotExist:
+        pass
+
+    return os.path.join('users', username, 'profile', f'{filename}')
+
 
 
 class UserProfile(models.Model):
@@ -28,7 +40,15 @@ class UserProfile(models.Model):
 
     profile_picture = models.ImageField(
         upload_to = user_profile_path, blank=True, null=True)
-    
+
+@receiver(post_delete, sender=UserProfile)
+def delete_profile_picture(sender, instance, **kwargs):
+    # Delete the profile picture file when a UserProfile instance is deleted
+    if instance.profile_picture:
+        if os.path.isfile(instance.profile_picture.path):
+            os.remove(instance.profile_picture.path)
+
+
 
 class Project(models.Model):
     title = models.CharField(max_length=20)

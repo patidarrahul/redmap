@@ -14,6 +14,15 @@ urlpatterns = [
     path('sign-out/', views.signOutView, name='sign-out'),
 
     path('profile/', views.profileView, name='profile'),
+     path('profile/update/', views.updateUserProfileView, name='update-profile'),
+    
+    
+    path('project/add/', views.addProjectView, name='add-project'),
+    path('project/update/<str:pk>/',
+         views.updateProjectView, name='update-project'),
+    
+    path('experiment/add/<str:pk>/',
+         views.addExperimentView, name='add-experiment'),
 
 
     path('reset-password/', auth_views.PasswordResetView.as_view(template_name='password-reset.html'), name='reset_password'),

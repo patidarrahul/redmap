@@ -2,6 +2,15 @@ from django import forms
 from .models import *
 
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['designation', 'profile_picture']
+        widgets = {
+            'designation': forms.TextInput(attrs={'class': 'form-control mt-2', 'placeholder': 'Designation'}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control mt-2', 'placeholder': 'Profile Picture'}),
+        }
+
 class InventoryForm(forms.ModelForm):
     class Meta:
         model = Inventory
@@ -88,3 +97,29 @@ class AddStackForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['substrate'].queryset = Inventory.objects.filter(
             item__category__name='Substrate')
+        
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['title',  'description', 'collaborators', 'created']
+
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'style': 'height: 200px;'}),
+            'collaborators': forms.SelectMultiple(attrs={'class': 'form-select', 'style': 'height: 200px;'}),
+            'created': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+        }
+
+
+class ExperimentForm(forms.ModelForm):
+    class Meta:
+        model = Experiment
+        fields = ['objective', 'notes', 'created']
+
+        widgets = {
+            'objective': forms.TextInput(attrs={'class': 'form-control'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control'}),
+            'created': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+
+        }

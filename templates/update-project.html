@@ -1,0 +1,49 @@
+{% extends 'base.html'%} {% block content %}
+
+<div class="container-fluid mx-auto" style="max-width: 90%; position: absolute; top: 40px">
+  <div class="card mt-4 shadow">
+    <div class="card-body">
+      <form method="POST" action="">
+        {% csrf_token %} 
+        <div class="row mb-2 g-3">
+          <div class="col-md-9 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.title}}
+              <label>{{form.title.label}}</label>
+            </div>
+          </div>
+          
+          <div class="col-md-3 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.created}}
+              <label>{{form.created.label}}</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          
+          <div class="col-md-6 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.collaborators}}
+              <label>{{form.collaborators.label}}</label>
+            </div>
+          </div>
+          <div class="col-md-6 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.description}}
+
+              <label>{{form.description.label}}</label>
+
+            </div>
+          </div>
+
+        </div>
+
+        
+      <button type="submit" class="btn btn-primary mt-4">Update</button>
+    </form>
+    </div>
+  </div>
+</div>
+
+{%endblock content%}
