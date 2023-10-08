@@ -14,7 +14,7 @@ from django.views.generic.list import ListView
 from django.urls import reverse_lazy
 
 from django.forms.models import BaseModelForm
-from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinStepForm, AddStackForm
+from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinStepForm, AddStackForm, ProjectForm, ExperimentForm, UserProfileForm
 
 
 
@@ -109,7 +109,7 @@ def signUpView(request):
 
         if User.objects.filter(email=email).exists() and User.objects.filter(username=username).exists():
             messages.error(request, f'User with email {email} or username {username} already exists')
-            return redirect('register')
+            return redirect('sign-up')
         else:
             user = User.objects.create_user(
                 email=email, password=password, first_name=first_name, last_name=last_name, username=username)
@@ -150,7 +150,86 @@ def profileView(request):
     }
     return render(request, 'profile.html', context)
 
+@login_required(login_url = 'sign-in')
+def updateUserProfileView(request):
+    user = request.user
+    profile = user.userprofile
+    form = UserProfileForm(instance=profile)
 
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, 'Profile updated successfully')
+            return redirect('profile')
+
+    context = {
+        'user': user,
+        'form': form,
+    }
+    return render(request, 'update-profile.html', context)
+
+@login_required(login_url = 'sign-in')
+def addProjectView(request):
+
+    form = ProjectForm()
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+
+        form.instance.author = User.objects.get(
+            username=request.user.username)
+
+        if form.is_valid():
+
+            form.save()
+            messages.success(request, 'Project added successfully')
+            return redirect('profile')
+
+    context = {
+
+        'form': form,
+
+    }
+    return render(request, 'add-project.html', context)
+
+@login_required(login_url = 'sign-in')
+def updateProjectView(request, pk):
+    project = Project.objects.get(id=pk)
+    form = ProjectForm(instance=project)
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Project updated successfully')
+            return redirect('profile')
+    context = {
+        'form': form
+    }
+    return render(request, 'update-project.html', context)
+
+@login_required(login_url = 'sign-in')
+def addExperimentView(request, pk):
+    project = Project.objects.get(id=pk)
+    form = ExperimentForm()
+    if request.method == 'POST':
+        form = ExperimentForm(request.POST)
+        if form.is_valid():
+            form.instance.author = User.objects.get(
+                username=request.user.username
+            )
+
+            form.instance.project = project
+            form.save()
+            messages.success(request, 'Experiment added successfully')
+            return redirect('profile')
+
+    context = {
+        'form': form,
+        'project': project
+    }
+
+    return render(request, 'add-experiment.html', context)
 
 
 # defining inventoryView, addInventoryView, updateInventoryView for inventory page 
@@ -725,3 +804,5 @@ def updateStackView(request, pk):
                'layers': layers, 'selectedValues': selectedValues, 'layer_list': layer_list}
 
     return render(request, 'update-stack.html', context)
+
+
