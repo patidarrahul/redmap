@@ -21,9 +21,10 @@
             <img src="{% static 'images/redmap-dark.png' %}" style = "width: 150px; height: 60px;"> 
         </a>
     </div>
-        
+    {% if user.userprofile.profile_picture %}
         <div class="header_img"> 
             <a href = "{% url 'profile' %}"><img src="{{user.userprofile.profile_picture.url}}" alt=""> </a></div>
+    {% endif %}
     </header>
     <div class="l-navbar" id="nav-bar">
         <nav class="nav">

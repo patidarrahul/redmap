@@ -464,7 +464,7 @@ def updateformulationView(request, pk):
 @login_required(login_url = 'sign-in')
 def layerRouter(request, pk):
     layer = Layer.objects.get(id=pk)
-    print(layer.coating_method)
+
     if layer.coating_method == 'Spin Coating':
         return redirect('update-spin-coated-layer', pk)
     elif layer.coating_method == 'Thermal Evaporation':
@@ -585,7 +585,7 @@ def updateSpinCoatedLayer(request, pk):
         created = request.POST.get('created')
 
         if action == 'save-as-new':
-            print('save as new')
+           
 
             layer = Layer.objects.create(added_by=request.user, name=name, coating_method='Spin Coating',
                                          layer_type=layer_type, formulation=Formulation.objects.get(
@@ -731,11 +731,7 @@ class StackView(LoginRequiredMixin,ListView):
         kwargs['stack_list'] = stack_list
         kwargs['realted_stacks'] = StackLayerRelationShip.objects.all()
 
-        for stack in stack_list:
-            print(stack.layers.all())
-            for layer in stack.layers.all():
-                print(layer)
-                print(type(layer))
+     
         return super().get_context_data(**kwargs)
 
 @login_required(login_url = 'sign-in')
@@ -780,7 +776,7 @@ def updateStackView(request, pk):
         form = AddStackForm(request.POST, instance=stack)
 
         if form.is_valid():
-            print('form is valid')
+  
             selected_layers = request.POST.get("selected-layers")
             selected_layers_list = selected_layers.split(
                 ",")
@@ -796,7 +792,7 @@ def updateStackView(request, pk):
             messages.success(request, 'Stack updated successfully')
             return redirect('stack')
         else:
-            print(form.errors)
+    
             messages.error(request, 'Stack could not be updated')
 
     context = {'form': form,

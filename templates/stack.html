@@ -70,6 +70,12 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script src = "{% static 'js/stack.js' %}"></script>
+<script> 
+  // Get a reference to the div element
+  var myDiv = document.getElementById("stack");
+
+  // Change the class when the page loads
+  myDiv.classList.add("active");
+</script>
 
 {% endblock content %}
