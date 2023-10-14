@@ -51,7 +51,7 @@ def delete_profile_picture(sender, instance, **kwargs):
 
 
 class Project(models.Model):
-    title = models.CharField(max_length=20)
+    title = models.CharField(max_length=100)
     description = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE)
