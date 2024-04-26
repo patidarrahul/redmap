@@ -39,7 +39,11 @@ SECRET_KEY = config['SECRET_KEY']
     
 
 DEBUG = True
-ALLOWED_HOSTS = ["*"]
+
+allowed_hosts_str = config.get('AllOWED_HOSTS_STRING')
+
+# Split the string into a list using commas
+ALLOWED_HOSTS = allowed_hosts_str.split(',')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
