@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Loading CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Importing Fonts -->
+    <link href='https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css' rel='stylesheet'>
+    <title>redmap</title>
+</head>
+<body id="body-pd" >
+   
+    <header class=" header " id="header" >
+        <div class ='px-3'>
+        <a href="#" > 
+              
+            <img src="{% static 'images/redmap-dark.png' %}" style = "width: 150px; height: 60px;"> 
+        </a>
+    </div>
+    {% if user.userprofile.profile_picture %}
+        <div class="header_img"> 
+            <a href = "{% url 'profile' %}"><img src="{{user.userprofile.profile_picture.url}}" alt=""> </a></div>
+    {% endif %}
+    </header>
+    <div class="l-navbar" id="nav-bar">
+        <nav class="nav">
+            <div> 
+                <div class=" header_toggle my-3"> 
+                    <i class='bx bx-menu' id="header-toggle"></i> 
+                </div>
+                
+                <div class="nav_list"> 
+                    <a href="#" class="nav_link" id = "dashboard"> 
+                        <i class='bx bx-grid-alt nav_icon'></i> 
+                        <span class="nav_name">Dashboard</span> 
+                    </a> 
+                    
+                    <a href="{% url 'inventory' %}" class="nav_link" id = "inventory"> 
+                        <i class='bx bx-atom nav_icon'></i> 
+                        <span class="nav_name">Inventory</span> 
+                    </a> 
+                    <a href="{% url 'formulation' %}" class="nav_link" id = "formulation"> 
+                        <i class='bx bx-bong nav_icon'></i> 
+                        <span class="nav_name">Formulation</span> 
+                    </a> 
+                    <a href="{% url 'layer' %}" class="nav_link" id = "layer"> 
+                        <i class='bx bx-layer-plus nav_icon'></i> 
+                        <span class="nav_name">Layer</span> 
+                    </a> 
+                    <a href="{% url 'stack' %}" class="nav_link" id = "stack"> 
+                        <i class='bx bx-layer nav_icon'></i>
+                  
+                        <span class="nav_name">Stack</span> 
+                    </a>
+                    <a href="{% url 'profile' %}" class="nav_link" id = "profile"> 
+                        <i class='bx bx-user nav_icon'></i> 
+                        <span class="nav_name">Profile</span> 
+                    </a>  
+                </div>
+            </div> 
+            <div>
+                {% if request.user.is_authenticated %}
+            <a href="{% url 'sign-out' %}" class="nav_link"> 
+                <i class='bx bx-log-out nav_icon'></i> 
+                <span class="nav_name">SignOut</span> 
+            </a>
+            {% else %}
+            <a href="{% url 'sign-in' %}" class="nav_link"> 
+                <i class='bx bx-log-out nav_icon'></i> 
+                <span class="nav_name">SignIn</span> 
+            </a>
+            {% endif %}
+        </div>
+        </nav>
+    </div>
+    <!--message container-->
+
+        <!-- if there are messages to display-->
+    {%if messages%}
+    <div class="alert alert-info alert-dismissible fade show col-md-4 mx-auto  text-center"
+          role="alert"
+          style = 'width : 50%'
+        >
+          {% for message in messages %}
+          <h6>{{ message }}</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    
+          {% endfor %}
+    </div>
+    {% endif %}
+    
+
+
+    <!--Container Main start-->
+    <main class = 'col main-content position-relative d-flex vh-100 justify-content-center align-items-center' style ="width: 100%;">
+        {% block content %}
+    
+        
+        {% endblock %}
+    </div>
+    </main>
+
+    <!--Container Main end-->
+<!-- Js Files -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script src = "{% static 'js/sidenav.js' %}"> </script>
+
+</body>
+</html>
+

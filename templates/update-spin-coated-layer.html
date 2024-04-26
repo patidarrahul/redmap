@@ -1,0 +1,242 @@
+{% extends 'Base.html'%} {% block content %}
+
+<div class="container-fluid mx-auto" style="position: absolute; top: 40px">
+  <div class="card shadow mt-4">
+  
+    <div class="card-body">
+      <h4 class = "mb-4">Update spin coating condition</h4>
+      <form class="col-12 g-3" method="POST" , action="">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-2">
+            <label for="layer-type" class="form-label">Layer Type</label>
+            <select id="layer-type" class="form-select" name="layer-type" required>
+              <option value="{{layer.layer_type}}" selected>{{layer.layer_type}}</option>
+
+              <option>ETL</option>
+              <option>HTL</option>
+              <option>Active Layer</option>
+              <option>Electrode</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="name" class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              value="{{layer.name}}"
+              required
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label for="fomulation" class="form-label">Formulation</label>
+            <select id="fomulation" class="form-select" name="formulation" required>
+              <option value="{{layer.formulation.id}}" selected>
+                {{layer.formulation.name}} {{layer.formulation.created|date:'d-m-Y'}}
+              </option>
+              {% for formulation in formulations %}
+              <option value="{{formulation.id}}">
+                {{formulation.name}} {{formulation.created|date:'d-m-Y'}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label for="program" class="form-label">Spin Program</label>
+            <select class="form-select" name="program-id" id="program" required>
+              <option value="{{condition.program.id}}" selected>{{condition.program.name}}</option>
+              {% for program in programs %}
+              <option value="{{program.id}}">{{program.name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-2">
+            <label for="formulation-volume" class="form-label">Formulation Volume</label>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                id="formulation-volume"
+                name="formulation-volume"
+                value="{{condition.formulation_volume}}"
+                step="0.01"
+                required
+              />
+              <span class="input-group-text">mL</span>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label for="antisolvent-used" class="form-label">Antisolvent?</label>
+            <select id="antisolvent-used" class="form-select" name="antisolvent-used">
+              <option value="{{condition.antisolvent_used}}" selected>{{antisolvent_used}}</option>
+              <option value="True">Yes</option>
+              <option value="False">No</option>
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label for="antisolvent" class="form-label">Antisolvent</label>
+            <select id="antisolvent" class="form-select" name="antisolvent">
+              <option value="{{condition.antisolvent.id}}" selected>
+                {{condition.antisolvent.item.name}}
+              </option>
+              {% for inventory in inventory_list %}
+              <option value=" {{ inventory.id }} ">{{inventory.item.name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="antisolvent-volume" class="form-label">Antisolvent Volume</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="antisolvent-volume"
+                name="antisolvent-volume"
+                value="{{condition.antisolvent_volume}}"
+                step="0.01"
+              />
+              <span class="input-group-text">mL</span>
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <label for="antisolvent-drop-time" class="form-label">Drop Time</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="antisolvent-drop-time"
+                name="antisolvent-drop-time"
+                value="{{condition.antisolvent_drop_time}}"
+              />
+              <span class="input-group-text">secs</span>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label for="room-temperature" class="form-label">Room Temperature</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="room-temperature"
+                name="room-temperature"
+                value="{{condition.room_temperature}}"
+                step="0.01"
+                required
+              />
+              <span class="input-group-text"><sup>o</sup>C</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-2">
+            <label for="room-humidity" class="form-label">Room Humidity</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="room-humidity"
+                step="0.01"
+                name="room-humidity"
+                value="{{condition.room_humidity}}"
+                required
+              />
+
+              <span class="input-group-text">%RH</span>
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <label for="atmosphere" class="form-label">Atmosphere</label>
+            <select id="atmosphere" class="form-select" name="atmosphere" required>
+              <option value="{{condition.atmosphere}}" selected>{{condition.atmosphere}}</option>
+              <option value="N2">N<sup>2</sup></option>
+              <option value="Air">Air</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="drying-type" class="form-label">Drying Type</label>
+            <select id="drying-type" class="form-select" name="drying-type" required>
+              <option value="{{condition.drying_type}}" selected>{{condition.drying_type}}</option>
+              <option>Hot Plate</option>
+              <option>Oven</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="drying-temperature" class="form-label">Drying Temperature</label>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                step="0.01"
+                id="drying-temperature"
+                name="drying-temperature"
+                value="{{condition.drying_temperature}}"
+              />
+              <span class="input-group-text"><sup>o</sup>C</span>
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <label for="drying-time" class="form-label">Drying Time</label>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                id="drying-time"
+                name="drying-time"
+                value="{{condition.drying_time}}"
+              />
+              <span class="input-group-text">mins</span>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label for="created" class="form-label">Coated On</label>
+            <input
+              type="date"
+              class="form-control"
+              id="created"
+              name="created"
+              value="{{layer.created|date:'Y-m-d'}}"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="row g-2 mt-3">
+          <button
+            type="submit"
+            class="btn btn-outline-primary col-md-2"
+            name="action"
+            value="update"
+          >
+            Update
+          </button>
+          <button
+            type="submit"
+            class="btn btn-outline-success col-md-3 mx-2"
+            name="action"
+            value="save-as-new"
+          >
+            Save as New
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

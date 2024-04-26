@@ -1,0 +1,80 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div class="container-fluid mx-auto" style="max-width: 90%; position: absolute; top: 100px">
+  <div class="card shadow">
+    <div class="card-body">
+      <form method="POST" action="">
+        {% csrf_token %}
+        <div class="row mt-2 mb-2 g-3">
+          <div class="col-md-5 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.item}}
+              <label>{{form.item.label}}</label>
+            </div>
+          </div>
+
+          <div class="col-md-3 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.batch}}
+              <label>{{form.batch.label}}</label>
+            </div>
+          </div>
+
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.arrival_date}}
+              <label>{{form.arrival_date.label}}</label>
+            </div>
+          </div>
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.expiry_date}}
+              <label>{{form.expiry_date.label}}</label>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2 mb-2 g-3">
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.total_units}}
+              <label>{{form.total_units.label}}</label>
+            </div>
+          </div>
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.unit_size}}
+              <label>{{form.unit_size.label}}</label>
+            </div>
+          </div>
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.measurement_unit}}
+              <label>Unit</label>
+            </div>
+          </div>
+          <div class="col-md-6 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.notes}}
+              <label>{{form.notes.label}}</label>
+            </div>
+          </div>
+
+          <div>
+            <input
+              type="Submit"
+              value="Add to Database"
+              class="btn btn-outline-primary w-25"
+              id="add_btn"
+            />
+          </div>
+          <div class="mt-4">
+            <a type="button" href="{% url 'add-item' %}"> <bold>Add Item</bold></a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src = "{% static 'js/inventory.js' %}"> </script>
+{% endblock %}

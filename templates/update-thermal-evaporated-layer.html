@@ -1,0 +1,88 @@
+{% extends 'base.html'%} {% block content %}
+
+<div class="container-fluid mx-auto" style="position: absolute; top: 40px">
+  <div class="card  shadow mt-4">
+
+    <div class="card-body">
+      <form class="col-12 g-3" method="POST" , action="">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-2">
+            <label for="layer-type" class="form-label">Layer Type</label>
+            <select id="layer-type" class="form-select" name="layer-type" required>
+              <option selected vaue="{{layer.layer_type}}">{{layer.layer_type}}</option>
+              <option>ETL</option>
+              <option>HTL</option>
+              <option>Active Layer</option>
+              <option>Top Contact</option>
+              <option>Passivation Layer</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="name" class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              value="{{layer.name}}"
+              required
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label for="formulation" class="formulation">Formulation</label>
+            <select id="formulation" class="form-select mt-2" name="formulation" required>
+              <option selected value="{{layer.formulation.id}}">
+                {{layer.formulation.name}}{{layer.formulation.created|date:'d-m-Y'}}
+              </option>
+              {% for formulation in formulation_list %}
+              <option value="{{formulation.id}}">
+                {{formulation.name}} {{formulation.created|date:'d-m-Y'}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="pressure" class="form-label">Pressure</label>
+            <div class="input-group">
+              <input
+                type="number"
+                step="0.1"
+                class="form-control"
+                id="pressure"
+                name="pressure"
+                value="{{condition.pressure}}"
+              />
+              <span class="input-group-text" style="background-color: rgb(216, 216, 216)">
+                10 <sup>-5</sup>&nbsp torr</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-2">
+            <label for="created" class="form-label">Coated On</label>
+            <input
+              type="date"
+              class="form-control"
+              id="created"
+              name="created"
+              required
+              value="{{layer.created|date:'Y-m-d'}}"
+            />
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-md-2">
+            <input type="submit" class="btn btn-outline-primary" value="Update" />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

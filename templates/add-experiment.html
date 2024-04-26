@@ -1,0 +1,13 @@
+{% extends 'base.html'%} {% block content %}
+
+
+<div class="container-fluid mx-auto" style="max-width: 90%; position: absolute; top: 40px">
+  <div class="card mt-4 shadow">
+    <div class="card-body">
+      <form method="POST" action="">
+      {% csrf_token %} {{form.as_p}}
+      <button type="submit" class="btn btn-primary">Add a New Experiment</button>
+    </form>
+  </div>
+</div>
+{%endblock content%}

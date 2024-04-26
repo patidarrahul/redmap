@@ -1,0 +1,66 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div class="container-fluid mx-auto" style="max-width: 90%; position: absolute; top: 100px">
+  <div class="card shadow">
+   
+      
+
+    <div class="card-body ">
+      <h4 class="mb-4">Add Item:</h4>
+      <form method="POST" action="">
+        {% csrf_token %}
+        <div class="row mb-2 g-3">
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.category}}
+              <label>{{form.category.label}}</label>
+            </div>
+          </div>
+
+          <div class="col-md-3 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.supplier}}
+              <label>{{form.supplier.label}}</label>
+            </div>
+          </div>
+
+          <div class="col-md-5 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.name}}
+              <label>{{form.name.label}}</label>
+            </div>
+          </div>
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.short_name}}
+              <label>{{form.short_name.label}}</label>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2 mb-2 g-3">
+          <div class="col-md-2 mt-2 mb-2">
+            <div class="form-floating">
+              {{form.type}}
+              <label>{{form.type.label}}</label>
+            </div>
+          </div>
+
+          <div>
+            <input
+              type="Submit"
+              value="Add to Database"
+              class="btn btn-outline-primary w-25"
+              id="add_btn"
+            />
+          </div>
+        </div>
+        <div class ='mt-4'>
+          <a type="button" href="{% url 'add-supplier' %}">Add Supplier</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src = "{% static 'js/inventory.js' %}"> </script>
+{% endblock %}

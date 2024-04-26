@@ -1,0 +1,81 @@
+{% extends 'base.html'%} {% load static %} {% block content %}
+
+<div class="container-fluid mx-auto" style="position: absolute; top: 40px">
+  <div class="mt-4">
+    <a href="{% url 'add-stack' %}" type="button" class="btn btn-outline-primary col-md-2">
+      Add a new Stack
+    </a>
+    <button type="button" class="btn btn-outline-success col-md-2" id="update-selected">
+      Update Selected
+    </button>
+  </div>
+  <div class="card shadow mb-4 mt-4">
+      
+    <div class="card-body">
+      <h4 class="mb-4">Stack List</h4>
+      <div class="table-responsive">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>Project</th>
+              <th>Experiment</th>
+              <th>Name</th>
+
+              <th>Layers</th>
+              <th>Coating Method</th>
+
+              <th>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for stack in stack_list %}
+
+            <tr>
+              <td>
+                <input type="checkbox" name="selected_stack" value="{{ stack.id }}" />
+              </td>
+              <td>{{stack.experiment.project.title|truncatechars:20}}</td>
+              <td>{{ stack.experiment.objective|truncatechars:20 }}</td>
+              <td>{{ stack.name }}</td>
+
+              <td>
+                {% for layer in stack.layers.all %}
+                <a
+                  href="{% url 'layer-router' layer.id %}"
+                  class="text-left"
+                  style="text-decoration: double"
+                >
+                  {{layer.layer_type}}<i class="bx bx-right-arrow-alt bx-xs"></i>{{layer.name}}
+                </a>
+                <br />
+                {% endfor %}
+              </td>
+              <td>
+                {% for layer in stack.layers.all %} {{layer.coating_method}}
+                <br />
+                {% endfor %}
+              </td>
+
+              <td>{{ stack.created |date:'D d M Y' }}</td>
+            </tr>
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script> 
+  // Get a reference to the div element
+  var myDiv = document.getElementById("stack");
+
+  // Change the class when the page loads
+  myDiv.classList.add("active");
+</script>
+
+{% endblock content %}
