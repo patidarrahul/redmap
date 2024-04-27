@@ -38,7 +38,7 @@ SECRET_KEY = config['SECRET_KEY']
 
     
 
-DEBUG = True
+DEBUG = False
 
 allowed_hosts_str = config.get('AllOWED_HOSTS_STRING')
 
