@@ -19,14 +19,15 @@ from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinS
 from django.conf import settings
 
 
-
 from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition, Stack, StackLayerRelationShip, Project
 
 # Create your views here.
 
+
 @login_required(login_url='sign-in')
 def indexView(request):
     return render(request, 'index.html')
+
 
 @login_required(login_url='sign-in')
 def dashboardView(request):
@@ -71,10 +72,12 @@ def signInView(request):
             return redirect('dashboard')
 
         else:
-            messages.error(request, f'Invalid username or password. Try again.')
+            messages.error(
+                request, f'Invalid username or password. Try again.')
             return redirect('sign-in')
 
     return render(request, 'sign-in.html')
+
 
 def signUpView(request):
     """
@@ -108,7 +111,8 @@ def signUpView(request):
         username = request.POST.get('username')
 
         if User.objects.filter(email=email).exists() and User.objects.filter(username=username).exists():
-            messages.error(request, f'User with email {email} or username {username} already exists')
+            messages.error(
+                request, f'User with email {email} or username {username} already exists')
             return redirect('sign-up')
         else:
             user = User.objects.create_user(
@@ -116,7 +120,8 @@ def signUpView(request):
 
             user.save()
             UserProfile.objects.create(user=user)
-            absolute_path = os.path.join(settings.MEDIA_ROOT, 'users', user.username)
+            absolute_path = os.path.join(
+                settings.MEDIA_ROOT, 'users', user.username)
             os.makedirs(absolute_path, exist_ok=True)
 
             messages.success(
@@ -124,7 +129,6 @@ def signUpView(request):
             return redirect('sign-in')
 
     return render(request, 'sign-up.html')
-
 
 
 def signOutView(request):
@@ -141,7 +145,8 @@ def signOutView(request):
     messages.success(request, f'You have been logged out.')
     return redirect('sign-in')
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def profileView(request):
     user = request.user
     projects = Project.objects.filter(author=user)
@@ -152,7 +157,8 @@ def profileView(request):
     }
     return render(request, 'profile.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def updateUserProfileView(request):
     user = request.user
     profile = user.userprofile
@@ -172,7 +178,8 @@ def updateUserProfileView(request):
     }
     return render(request, 'update-profile.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addProjectView(request):
 
     form = ProjectForm()
@@ -195,7 +202,8 @@ def addProjectView(request):
     }
     return render(request, 'add-project.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def updateProjectView(request, pk):
     project = Project.objects.get(id=pk)
     form = ProjectForm(instance=project)
@@ -210,7 +218,8 @@ def updateProjectView(request, pk):
     }
     return render(request, 'update-project.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addExperimentView(request, pk):
     project = Project.objects.get(id=pk)
     form = ExperimentForm()
@@ -234,9 +243,9 @@ def addExperimentView(request, pk):
     return render(request, 'add-experiment.html', context)
 
 
-# defining inventoryView, addInventoryView, updateInventoryView for inventory page 
+# defining inventoryView, addInventoryView, updateInventoryView for inventory page
 
-class inventoryView(LoginRequiredMixin,ListView):
+class inventoryView(LoginRequiredMixin, ListView):
 
     login_url = 'sign-in'
     model = Inventory
@@ -244,7 +253,8 @@ class inventoryView(LoginRequiredMixin,ListView):
     queryset = Inventory.objects.filter(completed=False)
     context_object_name = 'inventory_list'
 
-class addInventoryView(LoginRequiredMixin,CreateView):
+
+class addInventoryView(LoginRequiredMixin, CreateView):
     login_url = 'sign-in'
     model = Inventory
     template_name = 'add-inventory.html'
@@ -267,7 +277,7 @@ class addInventoryView(LoginRequiredMixin,CreateView):
         return super().form_invalid(form)
 
 
-class updateInventoryView(LoginRequiredMixin,UpdateView):
+class updateInventoryView(LoginRequiredMixin, UpdateView):
     login_url = 'sign-in'
     model = Inventory
     template_name = 'update-inventory.html'
@@ -289,7 +299,8 @@ class updateInventoryView(LoginRequiredMixin,UpdateView):
             messages.success(self.request, 'Update successful.')
             return super().form_valid(form)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def markascomplete(request, pk):
     inventory = Inventory.objects.get(id=pk)
     inventory.completed = True
@@ -298,7 +309,8 @@ def markascomplete(request, pk):
         request, f'{inventory.item.name} {inventory.batch} marked as complete')
     return redirect('inventory')
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addItemView(request):
     form = ItemForm()
     if request.method == 'POST':
@@ -315,7 +327,8 @@ def addItemView(request):
     }
     return render(request, 'add-item.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addSupplierView(request):
     form = SupplierForm()
     if request.method == 'POST':
@@ -332,8 +345,8 @@ def addSupplierView(request):
     return render(request, 'add-supplier.html', context)
 
 
-#formulation page views
-@login_required(login_url = 'sign-in')
+# formulation page views
+@login_required(login_url='sign-in')
 def formulationView(request):
     formulation_list = Formulation.objects.filter(completed=False)
     ingredient_quantity = IngredientQuantity.objects.all()
@@ -356,7 +369,8 @@ def formulationView(request):
 #         context['IngredientQuantity'] = IngredientQuantity.objects.all()
 #         return context
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addformulationView(request):
 
     if request.method == 'POST':
@@ -382,19 +396,20 @@ def addformulationView(request):
         return redirect('formulation')
 
     inventory_list = Inventory.objects.filter(
-        completed=False, item__category__name='Material')
+        completed=False, item__category__name='Chemical')
     measurement_units = MeasurementUnit.objects.all()
     context = {'inventory_list': inventory_list, 'measurement_units': measurement_units,
                }
     return render(request, 'add-formulation.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def updateformulationView(request, pk):
     formulation = Formulation.objects.get(id=pk)
     ingredients = IngredientQuantity.objects.filter(
         formulation=formulation)
     inventory_list = Inventory.objects.filter(
-        completed=False, item__category__name='Material')
+        completed=False, item__category__name='Chemical')
     measurement_units = MeasurementUnit.objects.all()
 
     added_by = request.user
@@ -471,9 +486,9 @@ def updateformulationView(request, pk):
     return render(request, 'update-formulation.html', context)
 
 
-#layer page views
+# layer page views
 
-@login_required(login_url = 'sign-in')
+@login_required(login_url='sign-in')
 def layerRouter(request, pk):
     layer = Layer.objects.get(id=pk)
 
@@ -481,17 +496,17 @@ def layerRouter(request, pk):
         return redirect('update-spin-coated-layer', pk)
     elif layer.coating_method == 'Thermal Evaporation':
         return redirect('update-thermal-evaporated-layer', pk)
-    
 
 
-class LayerView(LoginRequiredMixin,ListView):
+class LayerView(LoginRequiredMixin, ListView):
     login_url = 'sign-in'
     model = Layer
     template_name = 'layer.html'
     queryset = Layer.objects.all()
     context_object_name = 'layer_list'
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addSpinCoatedLayer(request):
 
     if request.method == 'POST':
@@ -553,8 +568,7 @@ def addSpinCoatedLayer(request):
     return render(request, 'add-spin-coated-layer.html', context)
 
 
-
-@login_required(login_url = 'sign-in')
+@login_required(login_url='sign-in')
 def updateSpinCoatedLayer(request, pk):
     # values for context
     layer = Layer.objects.get(id=pk)
@@ -597,7 +611,6 @@ def updateSpinCoatedLayer(request, pk):
         created = request.POST.get('created')
 
         if action == 'save-as-new':
-           
 
             layer = Layer.objects.create(added_by=request.user, name=name, coating_method='Spin Coating',
                                          layer_type=layer_type, formulation=Formulation.objects.get(
@@ -663,7 +676,8 @@ def updateSpinCoatedLayer(request, pk):
                'formulations': formulations, 'inventory_list': inventory_list, 'antisolvent_used': antisolvent_used, 'condition': condition}
     return render(request, 'update-spin-coated-layer.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addSpinStep(request):
 
     form = SpinStepForm()
@@ -680,13 +694,14 @@ def addSpinStep(request):
     context = {'form': form}
     return render(request, 'spin-step.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def addSpinProgram(request):
 
     form = SpinProgramForm()
     if request.method == 'POST':
         form = SpinProgramForm(request.POST)
-    
+
         if form.is_valid():
             form.save()
             return redirect('add-spin-coated-layer')
@@ -706,13 +721,14 @@ def addThermalEvaporatedLayerView(request):
         created = request.POST.get('created')
         layer = Layer.objects.create(added_by=request.user, name=name, coating_method='Thermal Evaporation', layer_type=layer_type,
                                      formulation=Formulation.objects.get(id=formulation), created=created)
-        
-        ThermalEvaporationCondition.objects.create(added_by=request.user, layer=layer, pressure=pressure)
-        
+
+        ThermalEvaporationCondition.objects.create(
+            added_by=request.user, layer=layer, pressure=pressure)
+
         messages.success(request, 'Layer added successfully')
         return redirect('layer')
-        
-    return render(request, 'add-thermal-evaporated-layer.html' , context)
+
+    return render(request, 'add-thermal-evaporated-layer.html', context)
 
 
 def updateThermalEvaporatedLayerView(request, pk):
@@ -721,7 +737,8 @@ def updateThermalEvaporatedLayerView(request, pk):
     if request.method == 'POST':
         layer.layer_type = request.POST.get('layer-type')
         layer.name = request.POST.get('name')
-        layer.formulation = Formulation.objects.get(id=request.POST.get('formulation'))
+        layer.formulation = Formulation.objects.get(
+            id=request.POST.get('formulation'))
         layer.created = request.POST.get('created')
         layer.save()
         condition.pressure = request.POST.get('pressure')
@@ -755,10 +772,10 @@ def StackView(request):
 #         kwargs['stack_list'] = stack_list
 #         kwargs['realted_stacks'] = StackLayerRelationShip.objects.all()
 
-     
+
 #         return super().get_context_data(**kwargs)
 
-@login_required(login_url = 'sign-in')
+@login_required(login_url='sign-in')
 def addStackView(request):
 
     layer_list = Layer.objects.all()
@@ -785,7 +802,8 @@ def addStackView(request):
     context = {'layer_list': layer_list, 'form': form}
     return render(request, 'add-stack.html', context)
 
-@login_required(login_url = 'sign-in')
+
+@login_required(login_url='sign-in')
 def updateStackView(request, pk):
     stack = Stack.objects.get(id=pk)
     substrate = Inventory.objects.get(id=stack.substrate.id)
@@ -800,7 +818,7 @@ def updateStackView(request, pk):
         form = AddStackForm(request.POST, instance=stack)
 
         if form.is_valid():
-  
+
             selected_layers = request.POST.get("selected-layers")
             selected_layers_list = selected_layers.split(
                 ",")
@@ -816,7 +834,7 @@ def updateStackView(request, pk):
             messages.success(request, 'Stack updated successfully')
             return redirect('stack')
         else:
-    
+
             messages.error(request, 'Stack could not be updated')
 
     context = {'form': form,
@@ -824,5 +842,3 @@ def updateStackView(request, pk):
                'layers': layers, 'selectedValues': selectedValues, 'layer_list': layer_list}
 
     return render(request, 'update-stack.html', context)
-
-
