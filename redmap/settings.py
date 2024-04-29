@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import json
-
-with open('config.json') as config_file: #provide absolute path of config.json is not lcoated in base dir
+CONFIG_PATH = os.getenv('CONFIG_PATH') #this is done becasue when launching appache its always best to provide absolute path
+with open(CONFIG_PATH) as config_file: 
     config = json.load(config_file) 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
