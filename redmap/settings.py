@@ -45,6 +45,10 @@ allowed_hosts_str = config.get('AllOWED_HOSTS_STRING')
 # Split the string into a list using commas
 ALLOWED_HOSTS = allowed_hosts_str.split(',')
 
+CSRF_TRUSTED_ORIGINS = []
+for host in ALLOWED_HOSTS:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
