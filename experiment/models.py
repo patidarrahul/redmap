@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 # Create your models here.
+
+
 def user_profile_path(instance, filename):
     """
     Generate the user profile path for a given filename.
@@ -31,7 +33,6 @@ def user_profile_path(instance, filename):
     return os.path.join('users', username, 'profile', f'{filename}')
 
 
-
 class UserProfile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE,
@@ -39,7 +40,8 @@ class UserProfile(models.Model):
     designation = models.CharField(max_length=100)
 
     profile_picture = models.ImageField(
-        upload_to = user_profile_path, blank=True, null=True)
+        upload_to=user_profile_path, blank=True, null=True)
+
 
 @receiver(post_delete, sender=UserProfile)
 def delete_profile_picture(sender, instance, **kwargs):
@@ -47,7 +49,6 @@ def delete_profile_picture(sender, instance, **kwargs):
     if instance.profile_picture:
         if os.path.isfile(instance.profile_picture.path):
             os.remove(instance.profile_picture.path)
-
 
 
 class Project(models.Model):
@@ -64,6 +65,7 @@ class Project(models.Model):
     class Meta:
         verbose_name_plural = 'Projects'
         ordering = ['-created']
+
     def __str__(self):
         return self.title
 
@@ -79,8 +81,10 @@ class Experiment(models.Model):
     class Meta:
         verbose_name_plural = 'Experiments'
         ordering = ['-created']
+
     def __str__(self):
         return "Expreiment ID:{} {}".format(self.id, self.objective[:20])
+
 
 class Category(models.Model):
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -122,7 +126,7 @@ class Item(models.Model):
         ('Liquid', 'Liquid'),
         ('Gas', 'Gas'),
     ]
-    type = models.CharField(max_length=20 ,choices=type_choice)
+    type = models.CharField(max_length=20, choices=type_choice)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -214,6 +218,7 @@ class IngredientQuantity(models.Model):
     def __str__(self):
         return f'{self.inventory.item.name}, {self.quantity} {self.measurement_unit.name} on {self.updated}'
 
+
 class Layer(models.Model):
 
     added_by = models.ForeignKey(
@@ -237,7 +242,8 @@ class Layer(models.Model):
 
     def __str__(self):
         return f'{self.coating_method} - Layer {self.name}'
-    
+
+
 class SpinStep(models.Model):
     spin_speed = models.IntegerField()
     spin_acceleration = models.IntegerField()
@@ -276,17 +282,17 @@ class SpinCoatingCondition(models.Model):
     antisolvent = models.ForeignKey(
         Inventory, on_delete=models.SET_NULL, null=True, blank=True)
     antisolvent_volume = models.FloatField(null=True, blank=True)
-    antisolvent_drop_time = models.IntegerField(null=True, blank=True)
+    antisolvent_drop_time = models.FloatField(null=True, blank=True)
 
-    room_temperature = models.IntegerField()
-    room_humidity = models.IntegerField()
+    room_temperature = models.FloatField()
+    room_humidity = models.FloatField()
 
     atmosphere = models.CharField(max_length=50)
 
     drying_type = models.CharField(
         max_length=50, null=True, blank=True)
-    drying_temperature = models.IntegerField(null=True, blank=True)
-    drying_time = models.IntegerField(null=True, blank=True)
+    drying_temperature = models.FloatField(null=True, blank=True)
+    drying_time = models.FloatField(null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
 
@@ -299,13 +305,11 @@ class SpinCoatingCondition(models.Model):
         return f'Spin Coated {self.layer.name}'
 
 
-
 class ThermalEvaporationCondition(models.Model):
     added_by = models.ForeignKey(
         User, on_delete=models.CASCADE)
     layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
     pressure = models.FloatField()
-
 
 
 class Stack(models.Model):
@@ -346,7 +350,6 @@ class Stack(models.Model):
 class StackLayerRelationShip(models.Model):
     stack = models.ForeignKey(Stack, on_delete=models.CASCADE)
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
-    
 
     added_at = models.DateTimeField(auto_now=True)
 
