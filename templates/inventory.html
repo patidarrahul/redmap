@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 
-<div class="container-fluid mx-auto" style="width : 90%; position: absolute; top: 10px">
+<div class="container-fluid mx-auto" style="width: 90%; position: absolute; top: 10px">
   <div class="mt-4">
     <a
       href="{% url 'add-inventory' %}"
@@ -19,8 +19,8 @@
       Mark as Complete
     </button>
   </div>
-  <div class="card mb-4 mt-4 shadow ">
-    <div class="card-body ">
+  <div class="card mb-4 mt-4 shadow">
+    <div class="card-body">
       <h4 class="card-title mb-4">Inventory</h4>
       <div class="table-responsive">
         <table class="table text-center">
@@ -44,7 +44,7 @@
                 <input type="checkbox" name="selected_inventory" value="{{ inventory.id }}" />
               </td>
               <td>{{ inventory.id }}</td>
-              <td>User</td>
+              <td>{{ inventory.added_by }}</td>
               <td>{{ inventory.item.category.name }}</td>
 
               <td>{{ inventory.item.supplier.name }}</td>
@@ -62,7 +62,6 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src = "{% static 'js/inventory.js' %}"> </script>
-
+<script src="{% static 'js/inventory.js' %}"></script>
 
 {% endblock content%}
