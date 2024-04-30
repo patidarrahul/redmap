@@ -1,10 +1,9 @@
-{% extends 'Base.html'%} {% block content %}
+{% extends 'base.html'%} {% block content %}
 
 <div class="container-fluid mx-auto" style="position: absolute; top: 40px">
   <div class="card shadow mt-4">
-  
     <div class="card-body">
-      <h4 class = "mb-4">Update spin coating condition</h4>
+      <h4 class="mb-4">Update spin coating condition</h4>
       <form class="col-12 g-3" method="POST" , action="">
         {% csrf_token %}
         <div class="row">
