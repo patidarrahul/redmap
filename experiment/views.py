@@ -754,7 +754,7 @@ def StackView(request):
     related_stacks = StackLayerRelationShip.objects.all()
 
     context = {
-        'object_list': stack_list,  # ListView expects 'object_list' by default
+        'stack_list': stack_list,  # ListView expects 'object_list' by default
         'related_stacks': related_stacks,
     }
 
