@@ -10,7 +10,6 @@
     </button>
   </div>
   <div class="card shadow mb-4 mt-4">
-      
     <div class="card-body">
       <h4 class="mb-4">Stack List</h4>
       <div class="table-responsive">
@@ -36,7 +35,15 @@
                 <input type="checkbox" name="selected_stack" value="{{ stack.id }}" />
               </td>
               <td>{{stack.experiment.project.title|truncatechars:20}}</td>
-              <td>{{ stack.experiment.objective|truncatechars:20 }}</td>
+              <td>
+                <a
+                  href="{% url 'experiment' stack.experiment.id %}"
+                  class="text-left"
+                  style="text-decoration: double"
+                >
+                  {{ stack.experiment.objective|truncatechars:20 }}
+                </a>
+              </td>
               <td>{{ stack.name }}</td>
 
               <td>
@@ -70,7 +77,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script> 
+<script>
   // Get a reference to the div element
   var myDiv = document.getElementById("stack");
 

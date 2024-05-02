@@ -19,7 +19,7 @@ from .forms import InventoryForm, ItemForm, SupplierForm, SpinProgramForm, SpinS
 from django.conf import settings
 
 
-from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition, Stack, StackLayerRelationShip, Project
+from .models import UserProfile, Inventory, MeasurementUnit, Formulation, IngredientQuantity, Layer, SpinCoatingCondition, SpinProgram, SpinStep, ThermalEvaporationCondition, Stack, StackLayerRelationShip, Project, Experiment
 
 # Create your views here.
 
@@ -842,3 +842,19 @@ def updateStackView(request, pk):
                'layers': layers, 'selectedValues': selectedValues, 'layer_list': layer_list}
 
     return render(request, 'update-stack.html', context)
+
+
+@login_required(login_url='sign-in')
+def experimentView(request, pk):
+    user = request.user
+    experiment = Experiment.objects.get(id=pk)
+
+    stacks_in_experiment = Stack.objects.filter(experiment=experiment)
+
+    context = {
+        'experiment': experiment,
+        'stacks_in_experiment': stacks_in_experiment,
+
+    }
+
+    return render(request, 'experiment.html', context)

@@ -1,0 +1,32 @@
+{% extends 'base.html' %} {% block content %}
+
+<div
+  class="container-fluid mx-auto"
+  style="position: absolute; top: 40px; max-width: 90%; overflow-y: auto"
+>
+  <div class="card mb-4 mt-4 shadow" style="overflow-y: auto">
+    <h2>Project: {{ experiment.project.title }}</h2>
+    <h3>Experiment Number:</h3>
+
+    <h4><br />Objective: {{ experiment.objective }}</h4>
+
+    <h4>Date Created: {{ experiment.created }}</h4>
+    <h4>Author: {{ experiment.author }}</h4>
+
+    <h5>
+      <br />
+      Stack: <br />
+      {% for stack in stacks_in_experiment %} <br /><b>{{ stack.name }}</b> <br />
+      {% for layer in stack.layers.all %} {{layer.layer_type}}<i
+        class="bx bx-right-arrow-alt bx-xs"
+      ></i
+      >{{layer.name}}
+      <br />
+      {% endfor %} {% endfor %}
+    </h5>
+
+    <p>Notes:{{ experiment.notes }}</p>
+  </div>
+</div>
+
+{% endblock %}
