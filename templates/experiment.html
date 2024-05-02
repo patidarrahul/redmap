@@ -16,12 +16,21 @@
     <h5>
       <br />
       Stack: <br />
-      {% for stack in stacks_in_experiment %} <br /><b>{{ stack.name }}</b> <br />
-      {% for layer in stack.layers.all %} {{layer.layer_type}}<i
+      {% for stack in stacks_in_experiment %}
+      <br /><b
+        >{{ forloop.counter }}.
+        <a
+          href="{% url 'update-stack' stack.id %}"
+          class="text-left"
+          style="text-decoration: double"
+          >{{ stack.name }}</a
+        ></b
+      >
+      <br />
+      {% for layer in stack.layers.all %} {{ layer.layer_type }}<i
         class="bx bx-right-arrow-alt bx-xs"
       ></i
-      >{{layer.name}}
-      <br />
+      >{{ layer.name }}<br />
       {% endfor %} {% endfor %}
     </h5>
 
